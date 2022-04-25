@@ -19,6 +19,7 @@
                     /*XMLHttpRequest has a response instance variable */
                     var data = JSON.parse(this.response);
                     var deck_id = data.deck_id;
+                    document.write("<p> Game Session ID: " + deck_id) + "<p>";
                 };    
                 request.send();
             }
