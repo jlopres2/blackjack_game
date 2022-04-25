@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Solitaire - In Browser
+        </title>
+        <script>
+            /*documention for XMLHttpRequest
+            https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest */
+            var getQuotes = function() 
+            {
+                var request = new XMLHttpRequest();
+                request.open("GET",
+                "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",true );
+                
+                /* onload event is an event */
+                request.onload = function() 
+                {
+                    /*XMLHttpRequest has a response instance variable */
+                    var data = JSON.parse(this.response);
+                    var deck_id = data.deck_id;
+                };    
+                request.send();
+            }
+        </script>
+        <link type = "text/css" rel = "stylesheet" href="styles/my_style.css">
+    </head>
+    <body onload="getQuotes()">
+        <div id = "border">
+            
+        </div>
+    </body>
+</html>
