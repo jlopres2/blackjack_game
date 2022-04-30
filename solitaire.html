@@ -128,9 +128,6 @@
 
                 countPlayerHand();
 
-                if (runningPlayerSum > 21)
-                    clickStand();
-
             };
 
             var codeToNumberPlayer = function(tempString)
@@ -142,11 +139,11 @@
                     return 0;
                 }
                 if (tempString == "K")
-                    return 13;
+                    return 10;
                 if (tempString == "Q")
-                    return 12;
+                    return 10;
                 if (tempString == "J")
-                    return 11;
+                    return 10;
                 if (tempString == "0")
                     return 10;
                 else
@@ -162,11 +159,11 @@
                     return 0;
                 }
                 if (tempString == "K")
-                    return 13;
+                    return 10;
                 if (tempString == "Q")
-                    return 12;
+                    return 10;
                 if (tempString == "J")
-                    return 11;
+                    return 10;
                 if (tempString == "0")
                     return 10;
                 else
@@ -216,9 +213,9 @@
                     return 0;
                 else if (playerAceCount == 1)
                 {
-                    if (runningPlayerSum + 10 <= 21)
+                    if (runningPlayerSum + 11 <= 21)
                     {
-                        aceValue = 10;
+                        aceValue = 11;
                         break breakme;
                     }
                     else
@@ -229,14 +226,9 @@
                 }
                 else if (playerAceCount == 2)
                 {
-                    if (runningPlayerSum + 20 <= 21)
+                    if (runningPlayerSum + 12 <= 21)
                     {
-                        aceValue = 20;
-                        break breakme;
-                    }
-                    else if (runningPlayerSum + 11 <= 21)
-                    {
-                        aceValue = 11;
+                        aceValue = 12;
                         break breakme;
                     }
                     else
@@ -256,9 +248,9 @@
                     return 0;
                 else if (dealerAceCount == 1)
                 {
-                    if (runningDealerSum + 10 <= 21)
+                    if (runningDealerSum + 11 <= 21)
                     {
-                        dealerAceValue = 10;
+                        dealerAceValue = 11;
                         break breakme;
                     }
                     else
@@ -269,14 +261,9 @@
                 }
                 else if (dealerAceCount == 2)
                 {
-                    if (runningDealerSum + 20 <= 21)
+                    if (runningDealerSum + 12 <= 21)
                     {
-                        dealerAceValue = 20;
-                        break breakme;
-                    }
-                    else if (runningDealerSum + 11 <= 21)
-                    {
-                        dealerAceValue = 11;
+                        dealerAceValue = 12;
                         break breakme;
                     }
                     else
@@ -311,7 +298,7 @@
 
             var loadUserCards = function()
             {
-                document.write('<div id = "endgameBanner"></div>');
+                document.write('<div style="justify-content: center; display: flex;" id = "endgameBanner"> <h1>Web BlackJack</h1> </div>');
                 document.write('<div style="justify-content: center; display: flex;"><ul id = "dealerHand" style = "list-style-type: none; justify-content:center; display: flex;"><li><img src="https://deckofcardsapi.com/static/img/' + cards[0].code + '.png" alt="Test Card" id = dealerCard></li></ul></div>');
                 document.write('<div><ul id = "playerHand" style = "list-style-type: none; justify-content:center; display: flex;"><li><img src="https://deckofcardsapi.com/static/img/' + cards[1].code + '.png" alt="Test Card" id = userCard1"></li>');
                 document.write('<li><img src="https://deckofcardsapi.com/static/img/' + cards[2].code + '.png" alt="Test Card" id = userCard2"></li></ul><div class = "clear"></div></div>');
@@ -324,10 +311,16 @@
                 var section = document.getElementById("cardOptions");
                 section.style.display = "none";
 
-                if (finalDealerCount > finalPlayerCount && finalDealerCount <= 21)
+                console.log("Final player = " + finalPlayerCount);
+                console.log("Final dealer = " + finalDealerCount);
+                if (finalDealerCount == finalPlayerCount)
+                    document.getElementById('endgameBanner').innerHTML = '<h1>Tie game.</h1>';
+                else if ((finalDealerCount > finalPlayerCount && finalDealerCount <= 21) || (finalPlayerCount > 21 && finalDealerCount <= 21))
                     document.getElementById('endgameBanner').innerHTML = '<h1>Dealer wins.</h1>';
-                else 
+                else if (finalPlayerCount <= 21)
                     document.getElementById('endgameBanner').innerHTML = '<h1>Player wins!</h1>';
+                else
+                    document.getElementById('endgameBanner').innerHTML = '<h1>Tie game.</h1>';
                 
             }
 
@@ -335,9 +328,9 @@
         <link type = "text/css" rel = "stylesheet" href="styles/my_style.css">
     </head>
     <body>
-        <h1>Welcome to Web BlackJack!</h1>
+        <h1 style="justify-content: center; display: flex;">Welcome to Web BlackJack!</h1>
+        <div style="justify-content: center; display: flex;">
         <button onClick = initLoad()>Click to begin!</button>
-        <div id = 'user'>
 
         </div>
     </body>
