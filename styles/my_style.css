@@ -1,0 +1,106 @@
+h1 {
+    font-size: 2.8em;
+    font-weight: bold;
+    color:deepskyblue;
+    text-align: center;
+}
+
+ul {
+    list-style-type: none;
+    margin-top: 0%;
+    margin-bottom: 0%;
+}
+
+a {
+    color:darkslategrey;
+}
+
+body {
+    font-size: 1em;
+    font-weight: normal;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: black;
+    text-align: left;
+    margin-left: 10%;
+    margin-right: 10%;
+    width: 1000px;
+    margin: 0 auto;
+}
+
+table{
+    border: 4px solid;
+    margin: 5%;
+    margin-bottom: 20%;
+}
+
+caption{
+    font-size: 2em;
+}
+
+td, th{
+    padding: 0.5em;
+    padding-right: 5em;
+    border: 4px solid;
+}
+
+#border {
+    border-style: solid;
+}
+
+#banner {
+    background-color: beige;
+    border-top: solid;
+    border-bottom: solid;
+}
+
+nav{
+    clear:left; /*doesn't allow anything next to it*/
+    padding:2em;
+    margin-left: 5em;
+}
+
+nav ul li { /* makes the list go horizontal */
+    float: left;
+    margin-right: 0.5em;
+}
+
+nav ul li a { /* makes the list have a nice border / fill background */
+    padding: 0.25em 1em;
+    text-decoration: none; /* no underline */
+    background-color: #EBF5FF; /* pale bluish white */
+    color: #4312AE; /* dark blue */
+    border: 2px solid black;
+    border-top-left-radius: 1em 1em; /* rounded corner! */
+    border-top-right-radius: 1em 1em; /* another rounded corner! */
+    }
+
+nav ul li a:hover { /* changes color when hovering over items in the list */
+    color: black;
+    background-color: white;
+    font-weight: bold;
+}
+
+li.jsList {
+    margin: 5%;
+  }
+  button.jsFun {  
+    margin-left: 15%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+  }
+  /*jsDom.html css */
+  table#bankTable {  
+    margin: 0 auto;
+  }
+  table#bankTable caption {
+    font-size: 1.5em;
+  }
+  h2#jsDom {
+    text-align: center;
+    margin-bottom: 5%;
+  }
+  button.bankAction {
+    margin-left: 35%;
+    margin-top:2%;
+  }
+
