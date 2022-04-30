@@ -2,33 +2,343 @@
 <html>
     <head>
         <title>
-            Solitaire - In Browser
+            Blackjack - In Browser
         </title>
+        <style>
+
+        </style>
         <script>
-            /*documention for XMLHttpRequest
-            https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest */
-            var getQuotes = function() 
+            window.cards = [];
+            window.gDeck_id = "";
+            var dealerCount;
+            var playerCount;
+            window.dealerCodes = [];
+            window.playerCodes = [];
+            window.playerAceCount = 0;
+            window.dealerAceCount = 0;
+            var runningPlayerSum;
+            var runningDealerSum;
+            var aceValue;
+            var dealerAceValue;
+            
+            var startNewGame = function()
             {
                 var request = new XMLHttpRequest();
                 request.open("GET",
-                "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",true );
-                
-                /* onload event is an event */
+                "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",false );
                 request.onload = function() 
                 {
-                    /*XMLHttpRequest has a response instance variable */
-                    var data = JSON.parse(this.response);
-                    var deck_id = data.deck_id;
-                    document.write("<p> Game Session ID: " + deck_id) + "<p>";
+                    data = JSON.parse(this.response);
+                    deck_id = data.deck_id;
+                    document.write("<p> Game Session ID: " + deck_id + "<p>");
+                    gDeck_id = deck_id;
                 };    
                 request.send();
+
+                dealerCount = 0;
+                playerCount = 0;
+                playerAceCount = 0;
+                dealerAceCount = 0;
+                aceValue = 0;
+                dealerAceValue = 0;
+                
+                refreshAceValues();
             }
+
+            var drawCards = function()
+            {
+                var request = new XMLHttpRequest();
+                request.open("GET",
+                "https://deckofcardsapi.com/api/deck/" + gDeck_id + "/draw/?count=3", false);
+                request.onload = function() 
+                {
+                    var data = JSON.parse(this.response);
+                    cards = data.cards;
+                    dealerCodes.push(cards[0].code);
+                    playerCodes.push(cards[1].code, cards[2].code);
+                };    
+                request.send();
+                
+            }
+
+            var clickStand = function()
+            {
+                countDealerHand();
+                refreshDealerAceValues();
+                finalPlayerCount = aceValue + runningPlayerSum;
+
+                while (runningDealerSum + dealerAceValue < 16)
+                {
+                    dealerHit();
+                }
+                finalDealerCount = runningDealerSum + dealerAceValue;
+                
+                endGame();
+            };
+
+            var dealerHit = function()
+            {
+                var request = new XMLHttpRequest();
+                request.open("GET",
+                "https://deckofcardsapi.com/api/deck/" + gDeck_id + "/draw/?count=1", false);
+                request.onload = function() 
+                {
+                    var data = JSON.parse(this.response);
+                    cards = data.cards;
+                };    
+                request.send();
+
+                var img = document.createElement('img');
+                var li = document. createElement("li");
+                img.src = 'https://deckofcardsapi.com/static/img/' + cards[0].code + '.png';
+                li.appendChild(img);
+                document.getElementById('dealerHand').appendChild(li);
+
+                dealerCodes.push(cards[0].code);
+
+                console.log(dealerCodes);
+
+                countDealerHand();
+
+                if (runningDealerSum > 21)
+                    clickStand();
+            }
+
+            var clickHit = function()
+            {
+                var request = new XMLHttpRequest();
+                request.open("GET",
+                "https://deckofcardsapi.com/api/deck/" + gDeck_id + "/draw/?count=1", false);
+                request.onload = function() 
+                {
+                    var data = JSON.parse(this.response);
+                    cards = data.cards;
+                };    
+                request.send();
+
+                var img = document.createElement('img');
+                var li = document. createElement("li");
+                img.src = 'https://deckofcardsapi.com/static/img/' + cards[0].code + '.png';
+                li.appendChild(img);
+                document.getElementById('playerHand').appendChild(li);
+
+                playerCodes.push(cards[0].code);
+
+                console.log(playerCodes);
+
+                countPlayerHand();
+
+                if (runningPlayerSum > 21)
+                    clickStand();
+
+            };
+
+            var codeToNumberPlayer = function(tempString)
+            {
+                var amount;
+                if (tempString == "A")
+                {
+                    playerAceCount++;
+                    return 0;
+                }
+                if (tempString == "K")
+                    return 13;
+                if (tempString == "Q")
+                    return 12;
+                if (tempString == "J")
+                    return 11;
+                if (tempString == "0")
+                    return 10;
+                else
+                    return parseInt(tempString);
+            }
+
+            var codeToNumberDealer = function(tempString)
+            {
+                var amount;
+                if (tempString == "A")
+                {
+                    dealerAceCount++;
+                    return 0;
+                }
+                if (tempString == "K")
+                    return 13;
+                if (tempString == "Q")
+                    return 12;
+                if (tempString == "J")
+                    return 11;
+                if (tempString == "0")
+                    return 10;
+                else
+                    return parseInt(tempString);
+            }
+            
+            var countPlayerHand = function()
+            {
+                cardsToNumbers = [];
+                currentPlayerHandLength = document.getElementById("playerHand").childElementCount;
+                cardsToNumbers.length = currentPlayerHandLength;
+
+                runningPlayerSum = 0;
+                playerAceCount = 0;
+
+                for (let i = 0; i < currentPlayerHandLength; i++)
+                {
+                    runningPlayerSum = runningPlayerSum + codeToNumberPlayer(playerCodes[i].substring(0,1));
+                    
+                }
+                refreshAceValues();
+            }
+
+            var countDealerHand = function()
+            {
+                cardsToNumbers = [];
+                currentDealerHandLength = document.getElementById("dealerHand").childElementCount;
+                cardsToNumbers.length = currentDealerHandLength;
+
+                runningDealerSum = 0;
+                dealerAceCount = 0;
+
+                for (let i = 0; i < currentDealerHandLength; i++)
+                {
+                    runningDealerSum = runningDealerSum + codeToNumberDealer(dealerCodes[i].substring(0,1));
+                    
+                }
+                refreshDealerAceValues();
+            }
+
+            var refreshAceValues = function()
+            {
+                console.log("acecount = " + playerAceCount);
+                console.log("playersum = " + runningPlayerSum);
+                breakme: 
+                if (playerAceCount == 0)
+                    return 0;
+                else if (playerAceCount == 1)
+                {
+                    if (runningPlayerSum + 10 <= 21)
+                    {
+                        aceValue = 10;
+                        break breakme;
+                    }
+                    else
+                    {
+                        aceValue = 1;
+                        break breakme;
+                    } 
+                }
+                else if (playerAceCount == 2)
+                {
+                    if (runningPlayerSum + 20 <= 21)
+                    {
+                        aceValue = 20;
+                        break breakme;
+                    }
+                    else if (runningPlayerSum + 11 <= 21)
+                    {
+                        aceValue = 11;
+                        break breakme;
+                    }
+                    else
+                    {
+                        aceValue = 2; 
+                        break breakme;
+                    }
+                }
+            }
+
+            var refreshDealerAceValues = function()
+            {
+                console.log("acecount = " + dealerAceCount);
+                console.log("dealersum = " + runningDealerSum);
+                breakme: 
+                if (dealerAceCount == 0)
+                    return 0;
+                else if (dealerAceCount == 1)
+                {
+                    if (runningDealerSum + 10 <= 21)
+                    {
+                        dealerAceValue = 10;
+                        break breakme;
+                    }
+                    else
+                    {
+                        dealerAceValue = 1;
+                        break breakme;
+                    } 
+                }
+                else if (dealerAceCount == 2)
+                {
+                    if (runningDealerSum + 20 <= 21)
+                    {
+                        dealerAceValue = 20;
+                        break breakme;
+                    }
+                    else if (runningDealerSum + 11 <= 21)
+                    {
+                        dealerAceValue = 11;
+                        break breakme;
+                    }
+                    else
+                    {
+                        dealerAceValue = 2; 
+                        break breakme;
+                    }
+                }
+            }
+
+            var initLoad = function() 
+            {
+                startNewGame();
+                drawCards();
+                loadUserCards();
+                countPlayerHand();
+                refreshAceValues();
+            };
+
+            var newGameBuffer = function()
+            {
+                playerAceCount = 0;
+                dealerAceCount = 0;
+                dealerCodes = [];
+                playerCodes = [];
+                document.body.innerHTML = '';
+                runningPlayerSum = 0;
+                runningDealerSum = 0;
+                aceValue = 0;
+                initLoad();
+            }
+
+            var loadUserCards = function()
+            {
+                document.write('<div id = "endgameBanner"></div>');
+                document.write('<div style="justify-content: center; display: flex;"><ul id = "dealerHand" style = "list-style-type: none; justify-content:center; display: flex;"><li><img src="https://deckofcardsapi.com/static/img/' + cards[0].code + '.png" alt="Test Card" id = dealerCard></li></ul></div>');
+                document.write('<div><ul id = "playerHand" style = "list-style-type: none; justify-content:center; display: flex;"><li><img src="https://deckofcardsapi.com/static/img/' + cards[1].code + '.png" alt="Test Card" id = userCard1"></li>');
+                document.write('<li><img src="https://deckofcardsapi.com/static/img/' + cards[2].code + '.png" alt="Test Card" id = userCard2"></li></ul><div class = "clear"></div></div>');
+                document.write('<div style="justify-content: center; display: flex;" id = "cardOptions"><button onClick = clickStand()>Stand</button><button onClick = clickHit()>Hit</button></div>');
+                document.write('<div style="justify-content: center; display: flex;" id = "cardOptions2"><button onClick = newGameBuffer()>Restart</button></div>');
+            };
+
+            var endGame = function()
+            {
+                var section = document.getElementById("cardOptions");
+                section.style.display = "none";
+
+                if (finalDealerCount > finalPlayerCount && finalDealerCount <= 21)
+                    document.getElementById('endgameBanner').innerHTML = '<h1>Dealer wins.</h1>';
+                else 
+                    document.getElementById('endgameBanner').innerHTML = '<h1>Player wins!</h1>';
+                
+            }
+
         </script>
         <link type = "text/css" rel = "stylesheet" href="styles/my_style.css">
     </head>
-    <body onload="getQuotes()">
-        <div id = "border">
-            
+    <body>
+        <h1>Welcome to Web BlackJack!</h1>
+        <button onClick = initLoad()>Click to begin!</button>
+        <div id = 'user'>
+
         </div>
     </body>
 </html>
